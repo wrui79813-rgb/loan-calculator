@@ -3,753 +3,544 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>全能私人借贷计算器 | 简洁专业记账工具</title>
-    <!-- 引入 SheetJS 用于导出 Excel -->
+    <title>全能私人借贷计算器 V2 | 多人账本</title>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            background: #f0f7f3;
-            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-            padding: 24px 20px;
-            color: #1e2f2c;
-        }
-
-        .container {
-            max-width: 1600px;
-            margin: 0 auto;
-        }
-
-        /* 头部 */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            flex-wrap: wrap;
-            margin-bottom: 28px;
-            gap: 15px;
-        }
-        h1 {
-            font-size: 1.9rem;
-            background: linear-gradient(135deg, #1f6e43, #2b8c5a);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            letter-spacing: -0.3px;
-        }
-        .sub {
-            color: #4a6a5e;
-            font-size: 0.85rem;
-        }
-        .toolbar {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        button {
-            background: #ffffffdd;
-            backdrop-filter: blur(4px);
-            border: 1px solid #cfe3da;
-            padding: 8px 16px;
-            border-radius: 60px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 0.85rem;
-            color: #1e4d3a;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
-        }
-        button.primary {
-            background: #2c7a4b;
-            border-color: #22663e;
-            color: white;
-            box-shadow: 0 2px 6px rgba(44,122,75,0.2);
-        }
-        button.primary:hover {
-            background: #1f5f3b;
-            transform: translateY(-1px);
-        }
-        button:hover {
-            background: #e9f3ef;
-            border-color: #bdd9ce;
-        }
-        .btn-danger {
-            background: #fceaea;
-            border-color: #e2b6b6;
-            color: #b13e3e;
-        }
-        .btn-danger:hover {
-            background: #f5d6d6;
-        }
-
-        /* 两栏布局 */
-        .dashboard {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 28px;
-        }
-        .loan-list-panel {
-            flex: 1.2;
-            min-width: 260px;
-            background: white;
-            border-radius: 28px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.03);
-            padding: 18px 12px;
-            border: 1px solid #e2efe9;
-            height: fit-content;
-        }
-        .loan-detail-panel {
-            flex: 3;
-            min-width: 520px;
-            background: white;
-            border-radius: 28px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.03);
-            padding: 20px 24px;
-            border: 1px solid #e2efe9;
-        }
-
-        .loan-item {
-            background: #fbfefc;
-            border-radius: 20px;
-            padding: 14px 16px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            border: 1px solid #e2efe9;
-            transition: all 0.15s;
-        }
-        .loan-item.active {
-            background: #e9f5ef;
-            border-left: 5px solid #2c7a4b;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .loan-title {
-            font-weight: 700;
-            font-size: 1.1rem;
-            display: flex;
-            justify-content: space-between;
-        }
-        .loan-badge {
-            font-size: 0.7rem;
-            background: #e2ede7;
-            padding: 2px 8px;
-            border-radius: 20px;
-        }
-        .loan-stats {
-            font-size: 0.75rem;
-            color: #4a6e60;
-            margin-top: 8px;
-        }
-        .add-loan-btn {
-            width: 100%;
-            margin-top: 12px;
-            background: #ecf9f2;
-        }
-
-        /* 表单组件 */
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-            background: #fafefb;
-            padding: 18px;
-            border-radius: 24px;
-        }
-        .field {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        label {
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: #608b78;
-            letter-spacing: 0.5px;
-        }
-        input, select {
-            padding: 10px 12px;
-            border: 1px solid #cee0d8;
-            border-radius: 20px;
-            background: white;
-            font-size: 0.9rem;
-            transition: 0.2s;
-        }
-        input:focus, select:focus {
-            outline: none;
-            border-color: #2c7a4b;
-            box-shadow: 0 0 0 2px #c7e0d4;
-        }
-
-        .info-card {
-            background: #f2f9f5;
-            border-radius: 24px;
-            padding: 16px 20px;
-            margin-bottom: 24px;
-        }
-        .repayment-mode-group {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-bottom: 18px;
-        }
-        .mode-chip {
-            background: white;
-            border-radius: 40px;
-            padding: 6px 16px;
-            border: 1px solid #c0dbcf;
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: 0.1s;
-        }
-        .mode-chip.active-mode {
-            background: #2c7a4b;
-            color: white;
-            border-color: #2c7a4b;
-        }
-        .repay-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            align-items: flex-end;
-        }
-        .repay-row .field {
-            flex: 1;
-            min-width: 140px;
-        }
-        hr {
-            margin: 20px 0;
-            border: none;
-            height: 1px;
-            background: #d9ebe3;
-        }
-        .history-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.8rem;
-        }
-        .history-table th, .history-table td {
-            padding: 12px 6px;
-            border-bottom: 1px solid #e2ede7;
-            text-align: left;
-        }
-        .small-btn {
-            background: transparent;
-            border: none;
-            color: #b1624b;
-            font-size: 0.7rem;
-            cursor: pointer;
-            padding: 4px 8px;
-        }
-        .inline-code {
-            font-family: monospace;
-            background: #eff5f1;
-            padding: 2px 6px;
-            border-radius: 12px;
-            font-size: 0.7rem;
-        }
-        .flex-between {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .export-group {
-            margin-top: 20px;
-            gap: 12px;
-            display: flex;
-            flex-wrap: wrap;
-        }
-        .badge {
-            background: #e0f0e9;
-            border-radius: 20px;
-            padding: 2px 8px;
-            font-size: 0.7rem;
-        }
-        @media (max-width: 780px) {
-            .loan-detail-panel { min-width: 100%; }
-        }
-        .clickable {
-            cursor: pointer;
-        }
-        .text-success { color: #19794d; }
-        .text-warning { color: #c26b2e; }
+        *{box-sizing:border-box;margin:0;padding:0}
+        :root{--primary:#2c7a4b;--primary-dark:#1f5f3b;--primary-light:#e9f5ef;--bg:#f0f7f3;--card:#fff;--border:#e2efe9;--text:#1e2f2c;--muted:#4a6a5e;--danger:#b13e3e;--danger-bg:#fceaea;--r:16px;--rl:24px}
+        body{background:var(--bg);font-family:-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--text);line-height:1.5}
+        .app{max-width:1600px;margin:0 auto;padding:16px}
+        .header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px}
+        .title{font-size:1.5rem;background:linear-gradient(135deg,#1f6e43,#2b8c5a);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800}
+        .subtitle{font-size:.78rem;color:var(--muted)}
+        .toolbar{display:flex;gap:8px;flex-wrap:wrap}
+        .btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:60px;border:1px solid var(--border);background:var(--card);font-size:.8rem;font-weight:500;cursor:pointer;transition:.15s;color:var(--text)}
+        .btn:hover{background:var(--primary-light)}
+        .btn-p{background:var(--primary);color:#fff;border-color:var(--primary-dark)}
+        .btn-p:hover{background:var(--primary-dark);transform:translateY(-1px)}
+        .btn-d{background:var(--danger-bg);color:var(--danger);border-color:#e2b6b6}
+        .btn-d:hover{background:#f5d6d6}
+        .btn-sm{padding:4px 10px;font-size:.72rem}
+        .btn-ghost{background:transparent;border:none;color:var(--muted);padding:2px 6px;cursor:pointer;font-size:.72rem}
+        .btn-ghost:hover{color:var(--danger)}
+        .ptabs{display:flex;align-items:center;gap:4px;margin-bottom:16px;background:var(--card);border-radius:var(--r);padding:6px;border:1px solid var(--border);flex-wrap:wrap;overflow-x:auto}
+        .ptab{padding:7px 14px;border-radius:10px;cursor:pointer;font-size:.83rem;font-weight:500;transition:.15s;border:none;background:transparent;color:var(--muted)}
+        .ptab:hover{background:var(--primary-light)}
+        .ptab.active{background:var(--primary);color:#fff;box-shadow:0 2px 8px rgba(44,122,75,.2)}
+        .ptab-add{padding:6px 12px;border-radius:10px;cursor:pointer;border:1px dashed #bdd9ce;background:transparent;color:var(--primary);font-size:.82rem}
+        .ptab-add:hover{background:var(--primary-light)}
+        .sbar{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:18px}
+        .scard{background:var(--card);border-radius:var(--r);padding:12px 14px;border:1px solid var(--border)}
+        .scard .lb{font-size:.67rem;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+        .scard .val{font-size:1.2rem;font-weight:700;color:var(--primary-dark)}
+        .dash{display:flex;gap:18px;flex-wrap:wrap}
+        .lpanel{flex:1;min-width:280px;max-width:380px;display:flex;flex-direction:column;gap:14px}
+        .rpanel{flex:2.5;min-width:380px}
+        .card{background:var(--card);border-radius:var(--rl);border:1px solid var(--border);padding:18px;box-shadow:0 4px 12px rgba(0,0,0,.02)}
+        .card-t{font-size:.92rem;font-weight:700;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+        .llist{max-height:48vh;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+        .litem{background:#fbfefc;border-radius:var(--r);padding:12px 14px;cursor:pointer;border:1px solid var(--border);transition:.15s;position:relative}
+        .litem:hover{border-color:#a8d4be}
+        .litem.active{background:var(--primary-light);border-left:4px solid var(--primary);box-shadow:0 2px 6px rgba(0,0,0,.04)}
+        .litem-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+        .litem-title{font-weight:700;font-size:.9rem}
+        .litem-stats{font-size:.72rem;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
+        .badge{font-size:.63rem;background:#e2ede7;padding:2px 7px;border-radius:20px}
+        .fsec{background:#fafefb;border-radius:var(--r);padding:14px;border:1px solid var(--border)}
+        .fsec.collapsed .fbody{display:none}
+        .fhdr{display:flex;justify-content:space-between;align-items:center;cursor:pointer;margin-bottom:10px;font-weight:600;font-size:.87rem}
+        .fsec.collapsed .fhdr{margin-bottom:0}
+        .fsec.collapsed .fhdr .ti{transform:rotate(-90deg)}
+        .fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+        .fd{display:flex;flex-direction:column;gap:4px}
+        .fd label{font-size:.68rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+        .fd input,.fd select{padding:8px 11px;border:1px solid #cee0d8;border-radius:11px;background:#fff;font-size:.86rem;transition:.2s;width:100%}
+        .fd input:focus,.fd select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 2px #c7e0d4}
+        .factions{margin-top:12px;display:flex;gap:8px}
+        .mgroup{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+        .mchip{padding:5px 12px;border-radius:30px;border:1px solid #c0dbcf;background:#fff;cursor:pointer;font-size:.76rem;transition:.15s}
+        .mchip:hover{background:var(--primary-light)}
+        .mchip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+        .dtable{width:100%;border-collapse:collapse;font-size:.78rem}
+        .dtable th{padding:9px 6px;text-align:left;border-bottom:2px solid var(--border);font-size:.7rem;color:var(--muted);text-transform:uppercase}
+        .dtable td{padding:9px 6px;border-bottom:1px solid #f0f5f2}
+        .dtable tr:hover td{background:#f8fcf9}
+        .igrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.83rem}
+        .igrid .ii{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed #e8f0ec}
+        .igrid .il{color:var(--muted)}
+        .igrid .iv{font-weight:600}
+        .empty{text-align:center;padding:50px 20px;color:#8fb3a4}
+        .empty .ei{font-size:2.2rem;margin-bottom:10px}
+        .overlay{position:fixed;inset:0;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;z-index:1000}
+        .dialog{background:#fff;border-radius:var(--rl);padding:24px;max-width:340px;width:90%;text-align:center}
+        .dialog h3{margin-bottom:10px}
+        .dialog p{color:var(--muted);margin-bottom:18px;font-size:.88rem}
+        .dialog .da{display:flex;gap:10px;justify-content:center}
+        .inline-prompt{position:fixed;inset:0;background:rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;z-index:1001}
+        .inline-prompt .ip-box{background:#fff;border-radius:var(--rl);padding:24px;max-width:360px;width:90%}
+        .inline-prompt .ip-box h3{margin-bottom:12px;font-size:1rem}
+        .inline-prompt .ip-box input{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:12px;font-size:.9rem;margin-bottom:14px}
+        .inline-prompt .ip-box .da{display:flex;gap:10px;justify-content:flex-end}
+        @media(max-width:900px){.lpanel{max-width:100%}.rpanel{min-width:100%}.dash{flex-direction:column}}
+        @media(max-width:500px){.app{padding:8px}.fgrid{grid-template-columns:1fr}.igrid{grid-template-columns:1fr}.sbar{grid-template-columns:1fr 1fr}}
+        .llist::-webkit-scrollbar{width:5px}
+        .llist::-webkit-scrollbar-thumb{background:#c0d9ce;border-radius:3px}
     </style>
 </head>
 <body>
-<div class="container">
+<div class="app">
     <div class="header">
-        <div>
-            <h1>📒 全能私人借贷计算器</h1>
-            <div class="sub">多人多笔 · 多还款模式 · 罚息复利 | 本地存储 隐私安全</div>
-        </div>
+        <div><div class="title">📒 全能私人借贷计算器</div><div class="subtitle">多人账本 · 多还款模式 · 单利复利罚息 | 本地存储 隐私安全</div></div>
         <div class="toolbar">
-            <button id="exportExcelBtn">📎 导出 Excel</button>
-            <button id="exportTxtBtn">📄 导出 TXT对账</button>
-            <button id="copySummaryBtn">📋 复制明细</button>
+            <button class="btn" onclick="exportExcel()">📎 导出Excel</button>
+            <button class="btn" onclick="exportTxt()">📄 导出对账</button>
+            <button class="btn" onclick="copySummary()">📋 复制汇总</button>
         </div>
     </div>
-    <div class="dashboard">
-        <!-- 左侧借款列表 -->
-        <div class="loan-list-panel">
-            <div id="loanListContainer" style="max-height: 70vh; overflow-y: auto;"></div>
-            <button class="add-loan-btn primary" id="addLoanBtn">+ 添加新借款</button>
+    <div class="ptabs" id="ptabs"></div>
+    <div class="sbar" id="sbar"></div>
+    <div class="dash">
+        <div class="lpanel">
+            <div class="card">
+                <div class="card-t"><span>💰 借款列表</span><span class="badge" id="loanCnt">0笔</span></div>
+                <div class="llist" id="llist"></div>
+            </div>
+            <div class="card fsec" id="addSec">
+                <div class="fhdr" onclick="toggleAddForm()"><span>➕ 新增借款</span><span class="ti">▼</span></div>
+                <div class="fbody" id="addBody">
+                    <div class="fgrid">
+                        <div class="fd"><label>借款人/用途</label><input id="nBorrower" placeholder="如：张三装修"></div>
+                        <div class="fd"><label>本金(¥)</label><input type="number" id="nPrincipal" step="0.01" placeholder="50000"></div>
+                        <div class="fd"><label>年利率(%)</label><input type="number" id="nRate" step="0.01" value="5"></div>
+                        <div class="fd"><label>借款日期</label><input type="date" id="nStart"></div>
+                        <div class="fd"><label>到期日</label><input type="date" id="nDue"></div>
+                        <div class="fd"><label>逾期罚息率(%)</label><input type="number" id="nPenalty" step="0.01" value="2"></div>
+                        <div class="fd"><label>计息方式</label><select id="nIntType"><option value="simple">单利</option><option value="compound">复利(日复利)</option></select></div>
+                        <div class="fd"><label>还款方式</label><select id="nRepay"><option value="先息后本">先息后本</option><option value="等额本息">等额本息</option><option value="随借随还">随借随还</option><option value="自定义">自定义</option></select></div>
+                    </div>
+                    <div class="factions">
+                        <button class="btn btn-p" onclick="saveLoan()">保存借款</button>
+                        <button class="btn" onclick="clearForm()">清空</button>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <!-- 右侧详情区 -->
-        <div class="loan-detail-panel" id="detailPanel">
-            <div style="text-align: center; padding: 40px 20px; color: #8fb3a4;">👈 从左侧选择或添加一笔借款</div>
-        </div>
+        <div class="rpanel"><div class="card" id="rpanel"><div class="empty"><div class="ei">👈</div><div>从左侧选择或新增一笔借款</div></div></div></div>
     </div>
 </div>
+<div id="overlay" class="overlay" style="display:none"><div class="dialog"><h3 id="dlgTitle"></h3><p id="dlgMsg"></p><div class="da"><button class="btn" id="dlgCancel">取消</button><button class="btn btn-d" id="dlgOk">确定</button></div></div></div>
+<div id="promptOvl" class="inline-prompt" style="display:none"><div class="ip-box"><h3 id="promptTitle"></h3><input id="promptInput" placeholder=""><div class="da"><button class="btn" id="promptCancel">取消</button><button class="btn btn-p" id="promptOk">确定</button></div></div></div>
 
 <script>
-    // ---------- 存储 KEY ----------
-    const STORAGE_LOANS = "private_loan_app_loans";
-    const STORAGE_REPAYS = "private_loan_app_repayments";
+const SK="loan_calc_v2_data";
+let D={persons:[],selPerson:null,selLoan:null};
+function save(){localStorage.setItem(SK,JSON.stringify(D))}
+function gid(){return Date.now()+Math.floor(Math.random()*1e5)}
+function esc(s){return s?s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])):''}
+function today(){return new Date().toISOString().slice(0,10)}
 
-    // ---------- 全局数据 ----------
-    let loans = [];          // 借款数组
-    let repayments = [];    // 还款记录数组 { id, loanId, date, amount, principalPaid, interestPaid, modeDesc, manualP? 但存储principalPaid,interestPaid}
-    let selectedLoanId = null;
-
-    // 辅助函数
-    function saveToLocal() {
-        localStorage.setItem(STORAGE_LOANS, JSON.stringify(loans));
-        localStorage.setItem(STORAGE_REPAYS, JSON.stringify(repayments));
-    }
-
-    function loadFromLocal() {
-        const storedLoans = localStorage.getItem(STORAGE_LOANS);
-        const storedRepays = localStorage.getItem(STORAGE_REPAYS);
-        if(storedLoans) loans = JSON.parse(storedLoans);
-        if(storedRepays) repayments = JSON.parse(storedRepays);
-        if(loans.length === 0) {
-            // 演示数据
-            const demoId = Date.now() + 1;
-            loans.push({
-                id: demoId,
-                borrower: "张三（装修借款）",
-                principal: 50000,
-                annualRate: 6.5,
-                startDate: "2025-01-10",
-                dueDate: "2025-12-31",
-                penaltyRate: 3.0,      // 逾期加罚年利率3%
-                interestType: "simple", // simple / compound
-                repaymentMethod: "先息后本" // 仅标识
-            });
-            repayments.push({
-                id: Date.now() + 2,
-                loanId: demoId,
-                date: "2025-03-15",
-                amount: 1250,
-                principalPaid: 0,
-                interestPaid: 1250,
-                modeDesc: "只还息"
-            });
-            saveToLocal();
+function load(){
+    const r=localStorage.getItem(SK);
+    if(r){try{D=JSON.parse(r)}catch(e){D={persons:[],selPerson:null,selLoan:null}}}
+    if(!D.persons){
+        // migrate old
+        const ol=localStorage.getItem("private_loan_app_loans");
+        const or=localStorage.getItem("private_loan_app_repayments");
+        D={persons:[],selPerson:null,selLoan:null};
+        if(ol){
+            const ls=JSON.parse(ol),rs=or?JSON.parse(or):[];
+            if(ls.length){const p={id:gid(),name:"默认账本",loans:ls,repayments:rs};D.persons.push(p);D.selPerson=p.id;}
         }
     }
-
-    // 工具: 计算两个日期间的天数
-    function diffDays(dateStr1, dateStr2) {
-        const d1 = new Date(dateStr1), d2 = new Date(dateStr2);
-        return Math.floor((d2 - d1) / (1000 * 60 * 60 * 24));
+    if(!D.persons.length){
+        const pid=gid(),lid=gid();
+        D.persons.push({id:pid,name:"示例账本",loans:[{id:lid,borrower:"张三（装修借款）",principal:50000,annualRate:6.5,startDate:"2025-01-10",dueDate:"2025-12-31",penaltyRate:3,interestType:"simple",repaymentMethod:"先息后本"}],repayments:[{id:gid(),loanId:lid,date:"2025-03-15",amount:1250,principalPaid:0,interestPaid:1250,modeDesc:"只还息"}]});
+        D.selPerson=pid;
     }
+    if(!D.selPerson&&D.persons.length)D.selPerson=D.persons[0].id;
+    save();
+}
 
-    // 核心利息计算 (单利/复利 + 逾期罚息) 基于区间 [fromDate, toDate], 本金 principalAmt, 借款参数 loan
-    // 返回正常利息 + 逾期额外利息 (罚息部分单独)
-    function calculateInterestSegment(loan, fromDate, toDate, principalAmt) {
-        if(principalAmt <= 0 || fromDate >= toDate) return { normalInterest: 0, penaltyInterest: 0, total: 0 };
-        const start = new Date(fromDate);
-        const end = new Date(toDate);
-        const due = new Date(loan.dueDate);
-        const annualRate = loan.annualRate / 100;
-        const penaltyAnnual = (loan.penaltyRate || 0) / 100;
-        const isCompound = loan.interestType === 'compound';
-        
-        // 切分时间段: 正常期间(开始~min(end, due)) , 逾期期间( max(start,due)~end)
-        let normalEnd = end < due ? end : due;
-        let overdueStart = start > due ? start : due;
-        let normalDays = 0, overdueDays = 0;
-        if(normalEnd > start) normalDays = Math.ceil((normalEnd - start) / (1000*60*60*24));
-        if(end > overdueStart) overdueDays = Math.ceil((end - overdueStart) / (1000*60*60*24));
-        
-        let normalInterest = 0, penaltyInterest = 0;
-        // 正常利息 (按原利率)
-        if(normalDays > 0 && annualRate > 0) {
-            if(isCompound) {
-                // 复利: 本金*(1+r_day)^天数 - 本金
-                let dailyRate = annualRate / 365;
-                normalInterest = principalAmt * (Math.pow(1 + dailyRate, normalDays) - 1);
-            } else {
-                normalInterest = principalAmt * annualRate * normalDays / 365;
-            }
-        }
-        // 逾期罚息: (原利率+罚息利率) 对逾期期间计息 (使用相同单利/复利规则,额外罚息)
-        if(overdueDays > 0 && (annualRate + penaltyAnnual) > 0) {
-            let totalOverdueRate = annualRate + penaltyAnnual;
-            if(isCompound) {
-                let dailyOverdue = totalOverdueRate / 365;
-                penaltyInterest = principalAmt * (Math.pow(1 + dailyOverdue, overdueDays) - 1);
-            } else {
-                penaltyInterest = principalAmt * totalOverdueRate * overdueDays / 365;
-            }
-            // 但是正常利息已经按照原利率算过逾期部分？避免重复，这里罚息仅采用额外增加的罚息利率部分较合理。为了专业性，只按(罚息利率)计算额外费用
-            // 修正: 逾期额外罚息利率应该只算罚息利率部分（不含原利率）更清晰
-            // 简化：重新计算准确的“额外逾期加收”: 使用单独罚息利率(penaltyAnnual)在逾期天数上
-            let extraPenalty = 0;
-            if(penaltyAnnual > 0) {
-                if(isCompound) {
-                    let dailyPenalty = penaltyAnnual / 365;
-                    extraPenalty = principalAmt * (Math.pow(1 + dailyPenalty, overdueDays) - 1);
-                } else {
-                    extraPenalty = principalAmt * penaltyAnnual * overdueDays / 365;
-                }
-            }
-            // 逾期期间的原利率已经在正常利息中如果包含超过due部分？为了避免重叠，之前正常利息只算到due为止，逾期部分只计罚息利率额外部分即可
-            penaltyInterest = extraPenalty;
-        }
-        return { normalInterest, penaltyInterest, total: normalInterest + penaltyInterest };
+function curPerson(){return D.persons.find(p=>p.id===D.selPerson)||null}
+
+// === Interest Calculation ===
+function calcInt(loan,from,to,principal){
+    if(principal<=0||from>=to)return{normal:0,penalty:0,total:0};
+    const s=new Date(from),e=new Date(to),d=new Date(loan.dueDate);
+    const ar=loan.annualRate/100,pr=(loan.penaltyRate||0)/100,ic=loan.interestType==='compound';
+    let ne=e<d?e:d,os=s>d?s:d;
+    let nd=0,od=0;
+    if(ne>s)nd=Math.ceil((ne-s)/864e5);
+    if(e>os)od=Math.ceil((e-os)/864e5);
+    let ni=0,pi=0;
+    if(nd>0&&ar>0){ni=ic?principal*(Math.pow(1+ar/365,nd)-1):principal*ar*nd/365}
+    if(od>0){
+        if(ar>0)ni+=ic?principal*(Math.pow(1+ar/365,od)-1):principal*ar*od/365;
+        if(pr>0)pi=ic?principal*(Math.pow(1+pr/365,od)-1):principal*pr*od/365;
     }
+    return{normal:ni,penalty:pi,total:ni+pi};
+}
 
-    // 获取某笔借款截至某个日期的累计利息总额(未还清前根据还款记录逐步计算已还利息) 但我们还款时动态顺序计算每次还款利息分配
-    // 为了展示还款前应收利息: 计算从上个结息日到还款日的利息。
-    // 为简化迭代，得到借款当前剩余本金及已还利息总额: 通过顺序应用还款记录来重算状态。
-    function getLoanState(loanId) {
-        const loan = loans.find(l => l.id === loanId);
-        if(!loan) return null;
-        let records = repayments.filter(r => r.loanId === loanId).sort((a,b)=> new Date(a.date) - new Date(b.date));
-        let remainingPrincipal = loan.principal;
-        let totalPaidInterest = 0;
-        let lastDate = loan.startDate;
-        for(let rec of records) {
-            // 计算区间利息 (lastDate -> rec.date)
-            const { total: interestAccrued } = calculateInterestSegment(loan, lastDate, rec.date, remainingPrincipal);
-            // 本次还款分配本金、利息 (存储的值)
-            let paidInterest = rec.interestPaid;
-            let paidPrincipal = rec.principalPaid;
-            totalPaidInterest += paidInterest;
-            remainingPrincipal -= paidPrincipal;
-            if(remainingPrincipal < 0) remainingPrincipal = 0;
-            lastDate = rec.date;
-        }
-        // 最后到今天未结清区间利息暂不展示在余额
-        return { remainingPrincipal, totalPaidInterest, lastInterestDate: lastDate, records };
-    }
+function loanState(person,lid){
+    const loan=person.loans.find(l=>l.id===lid);
+    if(!loan)return null;
+    let recs=person.repayments.filter(r=>r.loanId===lid).sort((a,b)=>new Date(a.date)-new Date(b.date));
+    let rp=loan.principal,tpi=0,tpp=0,ld=loan.startDate;
+    for(let r of recs){tpi+=r.interestPaid;tpp+=r.principalPaid;rp-=r.principalPaid;if(rp<0)rp=0;ld=r.date}
+    return{rp,tpi,tpp,ld,recs,loan};
+}
 
-    // 执行还款: 根据模式计算本息分配，并存储还款记录
-    function addRepayment(loanId, repayDate, repayAmount, mode, manualPrincipal=0, manualInterest=0) {
-        const loan = loans.find(l => l.id === loanId);
-        if(!loan) return { success: false, msg: "借款不存在" };
-        let { remainingPrincipal, lastInterestDate } = getLoanState(loanId);
-        if(remainingPrincipal <= 0 && repayAmount>0) return { success: false, msg: "本金已结清，无需还款" };
-        // 计算当前应计利息 (从上个结息日到 repayDate)
-        let segment = calculateInterestSegment(loan, lastInterestDate, repayDate, remainingPrincipal);
-        let dueInterest = segment.total;
-        let allocatedPrincipal = 0, allocatedInterest = 0;
-        
-        if(mode === 'interestOnly') {
-            // 只还息: 金额必须 <= 应计利息
-            if(repayAmount > dueInterest + 0.01) return { success: false, msg: "只还息模式下还款金额不能超过当前应付利息 "+dueInterest.toFixed(2) };
-            allocatedInterest = repayAmount;
-            allocatedPrincipal = 0;
-        } 
-        else if(mode === 'principalOnly') {
-            // 只还本: 全额还本金，但利息照常挂账
-            if(repayAmount > remainingPrincipal) return { success: false, msg: "只还本超出剩余本金" };
-            allocatedPrincipal = repayAmount;
-            allocatedInterest = 0;
+function doRepay(person,lid,date,amt,mode,mp=0,mi=0){
+    const loan=person.loans.find(l=>l.id===lid);
+    if(!loan)return{ok:false,msg:"借款不存在"};
+    const st=loanState(person,lid);
+    let rp=st.rp;
+    if(rp<=0&&amt>0)return{ok:false,msg:"本金已结清"};
+    const seg=calcInt(loan,st.ld,date,rp);
+    let due=seg.total,ap=0,ai=0;
+    if(mode==='interestOnly'){
+        if(amt>due+0.01)return{ok:false,msg:"只还息不能超过应付利息 ¥"+due.toFixed(2)};
+        ai=amt;
+    }else if(mode==='principalOnly'){
+        if(amt>rp+0.01)return{ok:false,msg:"超出剩余本金"};
+        ap=amt;
+    }else if(mode==='auto'){
+        if(amt<=due){ai=amt}else{ai=due;ap=Math.min(amt-due,rp)}
+    }else if(mode==='manual'){
+        if(Math.abs(mp+mi-amt)>0.01)return{ok:false,msg:"本息之和≠还款金额"};
+        if(mp>rp+0.01)return{ok:false,msg:"还本超出剩余本金"};
+        ap=mp;ai=mi;
+    }else return{ok:false,msg:"未知模式"};
+    person.repayments.push({id:gid(),loanId:lid,date,amount:amt,principalPaid:ap,interestPaid:ai,modeDesc:mode});
+    save();return{ok:true};
+}
+
+// === UI ===
+function render(){renderTabs();renderSummary();renderLoans();renderRight()}
+
+function renderTabs(){
+    const c=document.getElementById('ptabs');
+    let h=`<button class="ptab ${!D.selPerson?'active':''}" onclick="selPerson(null)">📊 所有人汇总</button>`;
+    D.persons.forEach(p=>{
+        h+=`<button class="ptab ${D.selPerson===p.id?'active':''}" onclick="selPerson(${p.id})">${esc(p.name)} <span class="btn-ghost" onclick="event.stopPropagation();delPerson(${p.id})" title="删除">✕</span></button>`;
+    });
+    h+=`<button class="ptab-add" onclick="addPerson()">+ 新增人员</button>`;
+    c.innerHTML=h;
+}
+
+function renderSummary(){
+    const c=document.getElementById('sbar');
+    let loans,repays;
+    if(!D.selPerson){loans=D.persons.flatMap(p=>p.loans);repays=D.persons.flatMap(p=>p.repayments)}
+    else{const p=curPerson();loans=p?p.loans:[];repays=p?p.repayments:[]}
+    let totalP=0,totalRepaid=0,totalRepCnt=repays.length,remainP=0,pendingInt=0;
+    loans.forEach(l=>{
+        totalP+=l.principal;
+        const person=D.persons.find(pp=>pp.loans.includes(l));
+        if(person){
+            const st=loanState(person,l.id);
+            remainP+=st.rp;
+            totalRepaid+=st.tpi+st.tpp;
+            const seg=calcInt(l,st.ld,today(),st.rp);
+            pendingInt+=seg.total;
         }
-        else if(mode === 'auto') {
-            // 自动抵扣: 先还清利息，剩余还本金
-            if(repayAmount <= dueInterest) {
-                allocatedInterest = repayAmount;
-                allocatedPrincipal = 0;
-            } else {
-                allocatedInterest = dueInterest;
-                allocatedPrincipal = Math.min(repayAmount - dueInterest, remainingPrincipal);
-            }
-        }
-        else if(mode === 'manual') {
-            if(manualPrincipal + manualInterest !== repayAmount) return { success: false, msg: "手动拆分本息之和不等于还款金额" };
-            if(manualPrincipal > remainingPrincipal) return { success: false, msg: "手动还本超出剩余本金" };
-            if(manualInterest > dueInterest + 0.01 && manualInterest>0.01) return { success: false, msg: `手动还息超出当前应付利息 ${dueInterest.toFixed(2)}` };
-            allocatedPrincipal = manualPrincipal;
-            allocatedInterest = manualInterest;
-        }
-        else return { success: false, msg: "未知模式" };
-        
-        // 保存还款记录
-        const newId = Date.now() + Math.random();
-        repayments.push({
-            id: newId,
-            loanId: loanId,
-            date: repayDate,
-            amount: repayAmount,
-            principalPaid: allocatedPrincipal,
-            interestPaid: allocatedInterest,
-            modeDesc: mode
+    });
+    c.innerHTML=`
+        <div class="scard"><div class="lb">总借款笔数</div><div class="val">${loans.length}</div></div>
+        <div class="scard"><div class="lb">总借款金额</div><div class="val">¥${fmt(totalP)}</div></div>
+        <div class="scard"><div class="lb">总还款金额</div><div class="val">¥${fmt(totalRepaid)}</div></div>
+        <div class="scard"><div class="lb">总还款次数</div><div class="val">${totalRepCnt}</div></div>
+        <div class="scard"><div class="lb">剩余本金合计</div><div class="val">¥${fmt(remainP)}</div></div>
+        <div class="scard"><div class="lb">待还利息合计</div><div class="val">¥${fmt(pendingInt)}</div></div>
+        <div class="scard"><div class="lb">本息合计(待还)</div><div class="val">¥${fmt(remainP+pendingInt)}</div></div>
+    `;
+}
+
+function renderLoans(){
+    const c=document.getElementById('llist');
+    const cnt=document.getElementById('loanCnt');
+    if(!D.selPerson){c.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted)">请选择具体人员查看借款列表</div>';cnt.textContent='';return}
+    const p=curPerson();
+    if(!p){c.innerHTML='';cnt.textContent='0笔';return}
+    cnt.textContent=p.loans.length+'笔';
+    if(!p.loans.length){c.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted)">暂无借款，请在下方新增</div>';return}
+    c.innerHTML=p.loans.map(l=>{
+        const st=loanState(p,l.id);
+        const active=D.selLoan===l.id?'active':'';
+        return`<div class="litem ${active}" onclick="selLoan(${l.id})">
+            <div class="litem-h"><span class="litem-title">🏷️ ${esc(l.borrower)}</span><span style="display:flex;gap:4px"><span class="badge">${l.repaymentMethod||'灵活'}</span><span class="btn-ghost" onclick="event.stopPropagation();editLoan(${l.id})" title="编辑">✏️</span><span class="btn-ghost" onclick="event.stopPropagation();delLoan(${l.id})" title="删除">🗑️</span></span></div>
+            <div class="litem-stats"><span>本金 ¥${fmt(l.principal)}</span><span>剩余 ¥${fmt(st.rp)}</span><span>${l.annualRate}% ${l.interestType==='compound'?'复利':'单利'}</span></div>
+        </div>`;
+    }).join('');
+}
+
+function renderRight(){
+    const c=document.getElementById('rpanel');
+    if(!D.selPerson||!D.selLoan){c.innerHTML='<div class="empty"><div class="ei">👈</div><div>从左侧选择或新增一笔借款</div></div>';return}
+    const p=curPerson();if(!p){c.innerHTML='';return}
+    const loan=p.loans.find(l=>l.id===D.selLoan);
+    if(!loan){c.innerHTML='<div class="empty">借款不存在</div>';D.selLoan=null;return}
+    const st=loanState(p,D.selLoan);
+    const seg=calcInt(loan,st.ld,today(),st.rp);
+    const pending=seg.total;
+    let h=`<div class="card-t"><span>📌 ${esc(loan.borrower)}</span><button class="btn btn-sm" onclick="copyLoanDetail(${loan.id})">📋 复制明细</button></div>
+    <div style="background:#f2f9f5;border-radius:var(--r);padding:14px;margin-bottom:16px">
+        <div class="igrid">
+            <div class="ii"><span class="il">💰 本金</span><span class="iv">¥${fmt(loan.principal)}</span></div>
+            <div class="ii"><span class="il">⚡ 年利率</span><span class="iv">${loan.annualRate}%</span></div>
+            <div class="ii"><span class="il">📅 借款日</span><span class="iv">${loan.startDate}</span></div>
+            <div class="ii"><span class="il">⚠️ 到期日</span><span class="iv">${loan.dueDate}</span></div>
+            <div class="ii"><span class="il">🔥 罚息率</span><span class="iv">${loan.penaltyRate}%</span></div>
+            <div class="ii"><span class="il">🧮 计息</span><span class="iv">${loan.interestType==='compound'?'复利(日复利)':'单利'}</span></div>
+            <div class="ii"><span class="il">🏦 剩余本金</span><span class="iv" style="color:var(--primary)">¥${fmt(st.rp)}</span></div>
+            <div class="ii"><span class="il">💸 已还利息</span><span class="iv">¥${fmt(st.tpi)}</span></div>
+            <div class="ii"><span class="il">💸 已还本金</span><span class="iv">¥${fmt(st.tpp)}</span></div>
+            <div class="ii"><span class="il">⏳ 待还利息</span><span class="iv" style="color:#c26b2e">¥${fmt(pending)}</span></div>
+        </div>
+    </div>
+    <div style="background:#FEF7E0;border-radius:var(--r);padding:14px;margin-bottom:16px">
+        <div style="font-weight:600;margin-bottom:10px">🧾 还款操作</div>
+        <div class="mgroup" id="modeGrp">
+            <span class="mchip active" data-m="auto">自动抵扣</span>
+            <span class="mchip" data-m="interestOnly">只还息</span>
+            <span class="mchip" data-m="principalOnly">只还本</span>
+            <span class="mchip" data-m="manual">手动拆分</span>
+        </div>
+        <div class="fgrid" style="grid-template-columns:repeat(auto-fill,minmax(140px,1fr))">
+            <div class="fd"><label>还款日期</label><input type="date" id="rDate" value="${today()}"></div>
+            <div class="fd"><label>还款金额(¥)</label><input type="number" id="rAmt" step="0.01" placeholder="0.00"></div>
+            <div class="fd" id="mpFd" style="display:none"><label>还本金额</label><input type="number" id="rMP" step="0.01" value="0"></div>
+            <div class="fd" id="miFd" style="display:none"><label>还息金额</label><input type="number" id="rMI" step="0.01" value="0"></div>
+        </div>
+        <div class="factions"><button class="btn btn-p" onclick="submitRepay()">确认还款</button></div>
+    </div>
+    <div style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center"><strong>📜 还款流水</strong><span class="badge">${st.recs.length}条</span></div>
+    <table class="dtable"><thead><tr><th>日期</th><th>金额</th><th>还本</th><th>还息</th><th>模式</th><th>操作</th></tr></thead><tbody>`;
+    if(!st.recs.length)h+=`<tr><td colspan="6" style="text-align:center;color:var(--muted)">暂无还款记录</td></tr>`;
+    else[...st.recs].reverse().forEach(r=>{
+        h+=`<tr><td>${r.date}</td><td>¥${fmt(r.amount)}</td><td>¥${fmt(r.principalPaid)}</td><td>¥${fmt(r.interestPaid)}</td><td>${modeLabel(r.modeDesc)}</td><td><button class="btn-ghost" onclick="delRepay(${r.id})">🗑️撤销</button></td></tr>`;
+    });
+    h+=`</tbody></table>`;
+    c.innerHTML=h;
+    // bind mode chips
+    document.querySelectorAll('#modeGrp .mchip').forEach(ch=>{
+        ch.onclick=()=>{
+            document.querySelectorAll('#modeGrp .mchip').forEach(x=>x.classList.remove('active'));
+            ch.classList.add('active');
+            const m=ch.dataset.m;
+            document.getElementById('mpFd').style.display=m==='manual'?'':'none';
+            document.getElementById('miFd').style.display=m==='manual'?'':'none';
+        };
+    });
+}
+
+function modeLabel(m){return{'auto':'自动抵扣','interestOnly':'只还息','principalOnly':'只还本','manual':'手动拆分'}[m]||m}
+function fmt(n){return(n||0).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2})}
+
+// === Actions ===
+function selPerson(id){D.selPerson=id;D.selLoan=null;save();render()}
+function selLoan(id){D.selLoan=id;save();renderLoans();renderRight()}
+
+function addPerson(){
+    showPrompt('新增人员','请输入人员名称',name=>{
+        if(!name.trim())return;
+        const np={id:gid(),name:name.trim(),loans:[],repayments:[]};
+        D.persons.push(np);D.selPerson=np.id;D.selLoan=null;save();render();
+    });
+}
+function delPerson(id){
+    const p=D.persons.find(x=>x.id===id);
+    showConfirm('删除「'+p.name+'」','该人员下所有借款和还款记录将永久删除，确定？',()=>{
+        D.persons=D.persons.filter(x=>x.id!==id);
+        if(D.selPerson===id){D.selPerson=D.persons[0]?.id||null;D.selLoan=null}
+        save();render();
+    });
+}
+
+function toggleAddForm(){
+    const sec=document.getElementById('addSec');
+    sec.classList.toggle('collapsed');
+}
+
+function saveLoan(){
+    if(!D.selPerson){alert('请先选择一个人员账本');return}
+    const p=curPerson();if(!p)return;
+    const b=document.getElementById('nBorrower').value.trim();
+    const pr=parseFloat(document.getElementById('nPrincipal').value);
+    const rt=parseFloat(document.getElementById('nRate').value);
+    const sd=document.getElementById('nStart').value;
+    const dd=document.getElementById('nDue').value;
+    const pn=parseFloat(document.getElementById('nPenalty').value)||0;
+    const it=document.getElementById('nIntType').value;
+    const rm=document.getElementById('nRepay').value;
+    if(!b){alert('请填写借款人');return}
+    if(isNaN(pr)||pr<=0){alert('请填写有效本金');return}
+    if(isNaN(rt)){alert('请填写利率');return}
+    if(!sd){alert('请填写借款日期');return}
+    if(!dd){alert('请填写到期日');return}
+    const lid=gid();
+    p.loans.push({id:lid,borrower:b,principal:pr,annualRate:rt,startDate:sd,dueDate:dd,penaltyRate:pn,interestType:it,repaymentMethod:rm});
+    D.selLoan=lid;save();clearForm();render();
+}
+
+function clearForm(){
+    document.getElementById('nBorrower').value='';
+    document.getElementById('nPrincipal').value='';
+    document.getElementById('nRate').value='5';
+    document.getElementById('nStart').value='';
+    document.getElementById('nDue').value='';
+    document.getElementById('nPenalty').value='2';
+    document.getElementById('nIntType').value='simple';
+    document.getElementById('nRepay').value='先息后本';
+}
+
+function editLoan(lid){
+    const p=curPerson();if(!p)return;
+    const loan=p.loans.find(l=>l.id===lid);if(!loan)return;
+    // Replace right panel with edit form
+    D.selLoan=lid;
+    const c=document.getElementById('rpanel');
+    c.innerHTML=`<div class="card-t"><span>✏️ 编辑借款</span></div>
+    <div class="fgrid">
+        <div class="fd"><label>借款人/用途</label><input id="eBorrower" value="${esc(loan.borrower)}"></div>
+        <div class="fd"><label>本金(¥)</label><input type="number" id="ePrincipal" step="0.01" value="${loan.principal}"></div>
+        <div class="fd"><label>年利率(%)</label><input type="number" id="eRate" step="0.01" value="${loan.annualRate}"></div>
+        <div class="fd"><label>借款日期</label><input type="date" id="eStart" value="${loan.startDate}"></div>
+        <div class="fd"><label>到期日</label><input type="date" id="eDue" value="${loan.dueDate}"></div>
+        <div class="fd"><label>逾期罚息率(%)</label><input type="number" id="ePenalty" step="0.01" value="${loan.penaltyRate}"></div>
+        <div class="fd"><label>计息方式</label><select id="eIntType"><option value="simple" ${loan.interestType==='simple'?'selected':''}>单利</option><option value="compound" ${loan.interestType==='compound'?'selected':''}>复利</option></select></div>
+        <div class="fd"><label>还款方式</label><select id="eRepay"><option ${loan.repaymentMethod==='先息后本'?'selected':''}>先息后本</option><option ${loan.repaymentMethod==='等额本息'?'selected':''}>等额本息</option><option ${loan.repaymentMethod==='随借随还'?'selected':''}>随借随还</option><option ${loan.repaymentMethod==='自定义'?'selected':''}>自定义</option></select></div>
+    </div>
+    <div class="factions"><button class="btn btn-p" onclick="saveEdit(${lid})">保存修改</button><button class="btn" onclick="renderRight()">取消</button></div>`;
+}
+
+function saveEdit(lid){
+    const p=curPerson();if(!p)return;
+    const loan=p.loans.find(l=>l.id===lid);if(!loan)return;
+    loan.borrower=document.getElementById('eBorrower').value.trim()||loan.borrower;
+    loan.principal=parseFloat(document.getElementById('ePrincipal').value)||loan.principal;
+    loan.annualRate=parseFloat(document.getElementById('eRate').value);
+    loan.startDate=document.getElementById('eStart').value||loan.startDate;
+    loan.dueDate=document.getElementById('eDue').value||loan.dueDate;
+    loan.penaltyRate=parseFloat(document.getElementById('ePenalty').value)||0;
+    loan.interestType=document.getElementById('eIntType').value;
+    loan.repaymentMethod=document.getElementById('eRepay').value;
+    save();render();
+}
+
+function delLoan(lid){
+    showConfirm('删除借款','删除后相关还款记录也会删除，确定？',()=>{
+        const p=curPerson();if(!p)return;
+        p.loans=p.loans.filter(l=>l.id!==lid);
+        p.repayments=p.repayments.filter(r=>r.loanId!==lid);
+        if(D.selLoan===lid)D.selLoan=null;
+        save();render();
+    });
+}
+
+function submitRepay(){
+    const p=curPerson();if(!p||!D.selLoan)return;
+    const date=document.getElementById('rDate').value;
+    const amt=parseFloat(document.getElementById('rAmt').value);
+    if(!date||isNaN(amt)||amt<=0){alert('请填写有效日期和金额');return}
+    const activeMode=document.querySelector('#modeGrp .mchip.active');
+    const mode=activeMode?activeMode.dataset.m:'auto';
+    let mp=0,mi=0;
+    if(mode==='manual'){mp=parseFloat(document.getElementById('rMP').value)||0;mi=parseFloat(document.getElementById('rMI').value)||0}
+    const res=doRepay(p,D.selLoan,date,amt,mode,mp,mi);
+    if(res.ok){render()}else{alert(res.msg)}
+}
+
+function delRepay(rid){
+    showConfirm('撤销还款','撤销后账目将回滚，确定？',()=>{
+        const p=curPerson();if(!p)return;
+        p.repayments=p.repayments.filter(r=>r.id!==rid);
+        save();render();
+    });
+}
+
+function copyLoanDetail(lid){
+    const p=curPerson();if(!p)return;
+    const st=loanState(p,lid);if(!st)return;
+    const seg=calcInt(st.loan,st.ld,today(),st.rp);
+    let t=`【借款】${st.loan.borrower}\n本金：¥${st.loan.principal} 利率：${st.loan.annualRate}%\n剩余本金：¥${st.rp.toFixed(2)} 已还利息：¥${st.tpi.toFixed(2)} 待还利息：¥${seg.total.toFixed(2)}\n还款记录：\n`;
+    st.recs.forEach(r=>{t+=`  ${r.date} 还款¥${r.amount.toFixed(2)} (本¥${r.principalPaid.toFixed(2)} 息¥${r.interestPaid.toFixed(2)}) ${modeLabel(r.modeDesc)}\n`});
+    navigator.clipboard.writeText(t).then(()=>alert('已复制'));
+}
+
+// === Export ===
+function exportExcel(){
+    let rows=[["人员","借款ID","借款人","本金","年利率%","借款日","到期日","剩余本金","已还利息","罚息率","计息方式"]];
+    D.persons.forEach(p=>{p.loans.forEach(l=>{const st=loanState(p,l.id);rows.push([p.name,l.id,l.borrower,l.principal,l.annualRate,l.startDate,l.dueDate,st.rp,st.tpi,l.penaltyRate,l.interestType])})});
+    rows.push([],["还款流水"]);
+    rows.push(["人员","记录ID","借款ID","还款日","金额","还本","还息","模式"]);
+    D.persons.forEach(p=>{p.repayments.forEach(r=>rows.push([p.name,r.id,r.loanId,r.date,r.amount,r.principalPaid,r.interestPaid,r.modeDesc]))});
+    const ws=XLSX.utils.aoa_to_sheet(rows);
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,ws,"借贷台账");
+    XLSX.writeFile(wb,`借贷台账_${today()}.xlsx`);
+}
+
+function exportTxt(){
+    let t="==== 全能借贷对账 ====\n";
+    D.persons.forEach(p=>{
+        t+=`\n【${p.name}】\n`;
+        p.loans.forEach(l=>{
+            const st=loanState(p,l.id);
+            t+=`  📌 ${l.borrower} 本金:${l.principal} 剩余:${st.rp.toFixed(2)} 已还利息:${st.tpi.toFixed(2)}\n`;
+            st.recs.forEach(r=>t+=`    ${r.date} +${r.amount} (本${r.principalPaid} 息${r.interestPaid})\n`);
         });
-        saveToLocal();
-        return { success: true, msg: "还款成功", recordId: newId };
-    }
+    });
+    const blob=new Blob([t],{type:"text/plain"});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`借贷对账_${today()}.txt`;a.click();URL.revokeObjectURL(a.href);
+}
 
-    function deleteRepayment(repayId) {
-        const idx = repayments.findIndex(r => r.id === repayId);
-        if(idx !== -1) {
-            repayments.splice(idx,1);
-            saveToLocal();
-            return true;
-        }
-        return false;
-    }
+function copySummary(){
+    let s="📊 借款汇总\n";
+    D.persons.forEach(p=>{
+        s+=`\n【${p.name}】\n`;
+        p.loans.forEach(l=>{const st=loanState(p,l.id);s+=`  ${l.borrower}: 剩余¥${st.rp.toFixed(2)} 已还利息¥${st.tpi.toFixed(2)}\n`});
+    });
+    navigator.clipboard.writeText(s).then(()=>alert('已复制汇总'));
+}
 
-    // UI 渲染 ---------------------------------
-    function renderLoanList() {
-        const container = document.getElementById('loanListContainer');
-        if(!container) return;
-        if(loans.length === 0) {
-            container.innerHTML = '<div style="padding: 24px; text-align:center;">暂无借款，点击添加</div>';
-            return;
-        }
-        container.innerHTML = loans.map(loan => {
-            const state = getLoanState(loan.id);
-            const remain = state ? state.remainingPrincipal : loan.principal;
-            const activeClass = selectedLoanId === loan.id ? 'active' : '';
-            return `<div class="loan-item ${activeClass}" data-id="${loan.id}">
-                        <div class="loan-title">
-                            <span>🏷️ ${escapeHtml(loan.borrower)}</span>
-                            <span class="loan-badge">${loan.repaymentMethod || '灵活'}</span>
-                        </div>
-                        <div class="loan-stats">
-                            本金: ¥${loan.principal.toFixed(2)} | 剩余: ¥${remain.toFixed(2)}<br>
-                            利率: ${loan.annualRate}% | ${loan.interestType === 'compound' ? '复利' : '单利'}
-                        </div>
-                    </div>`;
-        }).join('');
-        // 绑定点击事件
-        document.querySelectorAll('.loan-item').forEach(el => {
-            el.addEventListener('click', (e) => {
-                const id = parseInt(el.dataset.id);
-                selectedLoanId = id;
-                renderLoanList();
-                renderDetailPanel();
-            });
-        });
-    }
+// === Dialogs (no prompt/confirm) ===
+let _confirmCb=null;
+function showConfirm(title,msg,cb){
+    document.getElementById('dlgTitle').textContent=title;
+    document.getElementById('dlgMsg').textContent=msg;
+    document.getElementById('overlay').style.display='flex';
+    _confirmCb=cb;
+}
+document.getElementById('dlgCancel').onclick=()=>{document.getElementById('overlay').style.display='none';_confirmCb=null}
+document.getElementById('dlgOk').onclick=()=>{document.getElementById('overlay').style.display='none';if(_confirmCb)_confirmCb();_confirmCb=null}
 
-    function renderDetailPanel() {
-        const panel = document.getElementById('detailPanel');
-        if(!selectedLoanId) {
-            panel.innerHTML = `<div style="text-align:center;padding:40px;">👈 从左侧选择或添加一笔借款</div>`;
-            return;
-        }
-        const loan = loans.find(l => l.id === selectedLoanId);
-        if(!loan) { panel.innerHTML = '<div>借款不存在</div>'; return; }
-        const state = getLoanState(loan.id);
-        const remaining = state.remainingPrincipal;
-        const paidInterest = state.totalPaidInterest;
-        const records = state.records;
-        
-        // 计算至今未还利息（到今日）
-        const todayStr = new Date().toISOString().slice(0,10);
-        const curSegment = calculateInterestSegment(loan, state.lastInterestDate, todayStr, remaining);
-        const pendingInterest = curSegment.total;
-        
-        let html = `
-            <div class="flex-between"><h3>📌 ${escapeHtml(loan.borrower)}</h3>
-            <button id="editLoanBtn" class="small-btn" style="background:#eef3f0;">✏️ 编辑借款</button></div>
-            <div class="info-card">
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-                    <div>💰 本金: <strong>¥${loan.principal.toFixed(2)}</strong></div>
-                    <div>⚡ 年利率: ${loan.annualRate}%</div>
-                    <div>📅 借款日: ${loan.startDate}</div>
-                    <div>⚠️ 到期日: ${loan.dueDate}</div>
-                    <div>🔥 罚息利率: ${loan.penaltyRate}% (额外)</div>
-                    <div>🧮 计息: ${loan.interestType === 'compound' ? '复利(日复利)' : '单利'}</div>
-                    <div>🏦 剩余本金: <span class="text-success">¥${remaining.toFixed(2)}</span></div>
-                    <div>💸 已还利息: ¥${paidInterest.toFixed(2)}</div>
-                    <div>⏳ 当前待还利息: ¥${pendingInterest.toFixed(2)}</div>
-                </div>
-            </div>
-            <div style="background:#FEF7E0; border-radius:20px; padding:12px 16px; margin-bottom:18px;">
-                <strong>🧾 还款操作</strong>
-                <div class="repayment-mode-group" id="modeSelectGroup">
-                    <div class="mode-chip" data-mode="auto">自动抵扣</div>
-                    <div class="mode-chip" data-mode="interestOnly">只还息</div>
-                    <div class="mode-chip" data-mode="principalOnly">只还本</div>
-                    <div class="mode-chip" data-mode="manual">手动拆分本息</div>
-                </div>
-                <div class="repay-row" id="repayFormArea">
-                    <div class="field"><label>还款日期</label><input type="date" id="repayDate" value="${new Date().toISOString().slice(0,10)}"></div>
-                    <div class="field"><label>还款金额 ¥</label><input type="number" id="repayAmount" step="0.01" placeholder="0.00"></div>
-                    <div id="manualFields" style="display:none; gap:12px; flex-wrap:wrap;">
-                        <div class="field"><label>还本金额</label><input type="number" id="manualPrincipal" step="0.01" value="0"></div>
-                        <div class="field"><label>还息金额</label><input type="number" id="manualInterest" step="0.01" value="0"></div>
-                    </div>
-                    <button id="confirmRepayBtn" class="primary" style="margin-top:22px;">确认还款</button>
-                </div>
-            </div>
-            <hr>
-            <div class="flex-between"><strong>📜 还款流水 (可撤销)</strong><span class="badge">最近优先</span></div>
-            <table class="history-table">
-                <thead><tr><th>还款日</th><th>金额</th><th>还本金</th><th>还利息</th><th>模式</th><th>操作</th></tr></thead>
-                <tbody>
-        `;
-        if(records.length === 0) html += `<tr><td colspan="6" style="text-align:center;">暂无还款记录</td></tr>`;
-        else {
-            [...records].reverse().forEach(rec => {
-                html += `<tr>
-                    <td>${rec.date}</td><td>¥${rec.amount.toFixed(2)}</td>
-                    <td>¥${rec.principalPaid.toFixed(2)}</td><td>¥${rec.interestPaid.toFixed(2)}</td>
-                    <td>${rec.modeDesc}</td>
-                    <td><button class="small-btn delete-repay" data-id="${rec.id}">🗑️撤销</button></td>
-                </tr>`;
-            });
-        }
-        html += `</tbody></table>
-            <div class="export-group"><button id="copyLoanDetailBtn">📋 复制本笔明细</button></div>
-        `;
-        panel.innerHTML = html;
-        
-        // 模式切换逻辑
-        let currentMode = 'auto';
-        document.querySelectorAll('.mode-chip').forEach(chip => {
-            chip.addEventListener('click', (e) => {
-                document.querySelectorAll('.mode-chip').forEach(c => c.classList.remove('active-mode'));
-                chip.classList.add('active-mode');
-                currentMode = chip.dataset.mode;
-                const manualDiv = document.getElementById('manualFields');
-                if(currentMode === 'manual') manualDiv.style.display = 'flex';
-                else manualDiv.style.display = 'none';
-            });
-        });
-        document.getElementById('confirmRepayBtn')?.addEventListener('click', () => {
-            const repayDate = document.getElementById('repayDate').value;
-            const repayAmount = parseFloat(document.getElementById('repayAmount').value);
-            if(!repayDate || isNaN(repayAmount) || repayAmount <= 0) { alert("填写合法还款日期和金额"); return; }
-            let manualP=0, manualI=0;
-            if(currentMode === 'manual') {
-                manualP = parseFloat(document.getElementById('manualPrincipal').value) || 0;
-                manualI = parseFloat(document.getElementById('manualInterest').value) || 0;
-                if(manualP+manualI !== repayAmount) { alert("手动拆分本息之和不等于还款总额"); return; }
-            }
-            const res = addRepayment(selectedLoanId, repayDate, repayAmount, currentMode, manualP, manualI);
-            if(res.success) { renderLoanList(); renderDetailPanel(); }
-            else alert(res.msg);
-        });
-        document.querySelectorAll('.delete-repay').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const id = parseInt(btn.dataset.id);
-                if(confirm("撤销还款后账目将回滚，确认撤销？")) {
-                    deleteRepayment(id);
-                    renderLoanList();
-                    renderDetailPanel();
-                }
-            });
-        });
-        document.getElementById('editLoanBtn')?.addEventListener('click', () => editLoanDialog(loan));
-        document.getElementById('copyLoanDetailBtn')?.addEventListener('click', () => copyLoanSummary(loan, state, records, pendingInterest));
-    }
-    
-    function editLoanDialog(loan) {
-        const newBorrower = prompt("借款人/备注", loan.borrower);
-        if(newBorrower === null) return;
-        const newRate = parseFloat(prompt("年利率(%)", loan.annualRate));
-        if(isNaN(newRate)) return;
-        const newPenalty = parseFloat(prompt("逾期罚息年利率(%)", loan.penaltyRate));
-        const newDue = prompt("到期日(YYYY-MM-DD)", loan.dueDate);
-        const interestType = confirm("切换复利? (确定=复利, 取消=单利)") ? "compound" : "simple";
-        loan.borrower = newBorrower;
-        loan.annualRate = newRate;
-        loan.penaltyRate = isNaN(newPenalty)?0:newPenalty;
-        loan.dueDate = newDue;
-        loan.interestType = interestType;
-        saveToLocal();
-        renderLoanList();
-        renderDetailPanel();
-    }
-    
-    function copyLoanSummary(loan, state, records, pendingInterest) {
-        let text = `【借款】${loan.borrower}\n本金：${loan.principal} 利率：${loan.annualRate}% 剩余本金：${state.remainingPrincipal}\n已还利息：${state.totalPaidInterest} 待还利息：${pendingInterest}\n还款记录：\n`;
-        records.forEach(r => { text += `${r.date} 还款${r.amount} (本${r.principalPaid} 息${r.interestPaid}) 模式${r.modeDesc}\n`; });
-        navigator.clipboard.writeText(text); alert("已复制明细");
-    }
-    
-    function addLoanDialog() {
-        const borrower = prompt("借款人/用途", "新借款");
-        if(!borrower) return;
-        const principal = parseFloat(prompt("本金金额", "10000"));
-        if(isNaN(principal)) return;
-        const rate = parseFloat(prompt("年利率(%)", "5"));
-        const startDate = prompt("借款日期(YYYY-MM-DD)", new Date().toISOString().slice(0,10));
-        const dueDate = prompt("到期日", "2026-01-01");
-        const penalty = parseFloat(prompt("逾期罚息年利率(%)", "2"))||0;
-        const newId = Date.now();
-        loans.push({
-            id: newId, borrower, principal, annualRate: rate, startDate, dueDate,
-            penaltyRate: penalty, interestType: "simple", repaymentMethod: "自定义"
-        });
-        saveToLocal();
-        selectedLoanId = newId;
-        renderLoanList();
-        renderDetailPanel();
-    }
-    
-    // 导出Excel
-    function exportExcel() {
-        let rows = [["借款ID","借款人","本金","年利率%","借款日","到期日","剩余本金","已还利息","罚息率","计息方式"]];
-        loans.forEach(l => {
-            const st = getLoanState(l.id);
-            rows.push([l.id, l.borrower, l.principal, l.annualRate, l.startDate, l.dueDate, st.remainingPrincipal, st.totalPaidInterest, l.penaltyRate, l.interestType]);
-        });
-        rows.push([],["还款流水"]);
-        rows.push(["记录ID","借款ID","还款日","金额","还本","还息","模式"]);
-        repayments.forEach(r => rows.push([r.id, r.loanId, r.date, r.amount, r.principalPaid, r.interestPaid, r.modeDesc]));
-        const ws = XLSX.utils.aoa_to_sheet(rows);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "借贷台账");
-        XLSX.writeFile(wb, `借贷台账_${new Date().toISOString().slice(0,10)}.xlsx`);
-    }
-    function exportTxt() {
-        let txt = "==== 全能借贷对账 ====\n";
-        loans.forEach(l => {
-            const s = getLoanState(l.id);
-            txt += `📌 ${l.borrower} 本金:${l.principal} 剩余:${s.remainingPrincipal} 已还利息:${s.totalPaidInterest}\n`;
-            const recs = repayments.filter(r=>r.loanId===l.id);
-            recs.forEach(r=> txt += `  ${r.date} +${r.amount} (本${r.principalPaid} 息${r.interestPaid})\n`);
-        });
-        const blob = new Blob([txt], {type:"text/plain"});
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `借贷对账_${new Date().toISOString().slice(0,10)}.txt`;
-        a.click(); URL.revokeObjectURL(a.href);
-    }
-    function copySummaryAll() {
-        let str = "📊 借款汇总\n";
-        loans.forEach(l => {
-            const s = getLoanState(l.id);
-            str += `${l.borrower}: 剩余本金 ${s.remainingPrincipal} 已还利息 ${s.totalPaidInterest}\n`;
-        });
-        navigator.clipboard.writeText(str); alert("已复制总览");
-    }
-    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;});}
-    
-    function initUI() {
-        loadFromLocal();
-        renderLoanList();
-        if(loans.length>0) { selectedLoanId = loans[0].id; renderDetailPanel(); }
-        document.getElementById('addLoanBtn').onclick = addLoanDialog;
-        document.getElementById('exportExcelBtn').onclick = exportExcel;
-        document.getElementById('exportTxtBtn').onclick = exportTxt;
-        document.getElementById('copySummaryBtn').onclick = copySummaryAll;
-    }
-    initUI();
+let _promptCb=null;
+function showPrompt(title,placeholder,cb){
+    document.getElementById('promptTitle').textContent=title;
+    document.getElementById('promptInput').placeholder=placeholder||'';
+    document.getElementById('promptInput').value='';
+    document.getElementById('promptOvl').style.display='flex';
+    document.getElementById('promptInput').focus();
+    _promptCb=cb;
+}
+document.getElementById('promptCancel').onclick=()=>{document.getElementById('promptOvl').style.display='none';_promptCb=null}
+document.getElementById('promptOk').onclick=()=>{
+    const v=document.getElementById('promptInput').value;
+    document.getElementById('promptOvl').style.display='none';
+    if(_promptCb)_promptCb(v);_promptCb=null;
+}
+document.getElementById('promptInput').onkeydown=(e)=>{if(e.key==='Enter')document.getElementById('promptOk').click()}
+
+// === Init ===
+function init(){
+    load();
+    document.getElementById('nStart').value=today();
+    const dy=new Date();dy.setFullYear(dy.getFullYear()+1);
+    document.getElementById('nDue').value=dy.toISOString().slice(0,10);
+    render();
+}
+init();
 </script>
 </body>
 </html>
