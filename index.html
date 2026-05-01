@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>私人借贷计算器</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ===== 首页 ===== -->
+  <div id="page-home" class="page active">
+    <div class="header">
+      <div class="header-inner">
+        <div>
+          <h1>💰 私人借贷计算器</h1>
+          <div class="subtitle">纯离线 · 数据本地保存 · 精确到天</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="showAddLoanModal()">+ 新增</button>
+      </div>
+    </div>
+    <div class="container" id="home-content">
+      <!-- 动态渲染 -->
+    </div>
+    <div class="footer">
+      纯前端应用 · 数据仅保存在您的浏览器中 · 不收集任何信息
+    </div>
+  </div>
+
+  <!-- ===== 详情页 ===== -->
+  <div id="page-detail" class="page">
+    <div class="header">
+      <div class="header-inner">
+        <button class="back-btn" onclick="showPage('home')">‹ 返回</button>
+        <h1 id="detail-title">借款详情</h1>
+        <div></div>
+      </div>
+    </div>
+    <div class="container" id="detail-content">
+      <!-- 动态渲染 -->
+    </div>
+  </div>
+
+  <!-- ===== 新增/编辑借款弹窗 ===== -->
+  <div id="loan-modal" class="modal-overlay" onclick="if(event.target===this)closeLoanModal()">
+    <div class="modal">
+      <h2 class="modal-title" id="loan-modal-title">新增借款</h2>
+      <form id="loan-form">
+        <input type="hidden" id="loan-form-id">
+        
+        <div class="form-group">
+          <label>借款人姓名 *</label>
+          <input type="text" id="loan-borrower" placeholder="如：张三" required>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>本金（元）*</label>
+            <input type="number" id="loan-principal" step="0.01" min="0" placeholder="10000" required>
+          </div>
+          <div class="form-group">
+            <label>年利率（%）*</label>
+            <input type="number" id="loan-rate" step="0.01" min="0" placeholder="12" required>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>起借日期 *</label>
+            <input type="date" id="loan-start-date" required>
+          </div>
+          <div class="form-group">
+            <label>到期日期</label>
+            <input type="date" id="loan-due-date">
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>逾期罚息利率（%）</label>
+            <input type="number" id="loan-penalty-rate" step="0.01" min="0" placeholder="如 18">
+          </div>
+          <div class="form-group">
+            <label>期限（月）</label>
+            <input type="number" id="loan-term" min="1" placeholder="12">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>还款方式</label>
+          <select id="loan-type">
+            <option value="custom">自定义（灵活还款）</option>
+            <option value="interest_first">先息后本</option>
+            <option value="principal_first">先本后息</option>
+            <option value="equal_payment">等额本息</option>
+            <option value="equal_principal">等额本金</option>
+            <option value="lump_sum">到期一次性还本付息</option>
+          </select>
+        </div>
+        
+        <div class="switch-group">
+          <label class="switch">
+            <input type="checkbox" id="loan-compound">
+            <span class="slider"></span>
+          </label>
+          <span>启用复利（默认单利）</span>
+        </div>
+        
+        <div class="form-group">
+          <label>备注</label>
+          <textarea id="loan-note" rows="2" placeholder="可选备注"></textarea>
+        </div>
+        
+        <div class="btn-group">
+          <button type="submit" class="btn btn-primary btn-block">保存</button>
+          <button type="button" class="btn btn-outline btn-block" onclick="closeLoanModal()">取消</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== 新增还款弹窗 ===== -->
+  <div id="payment-modal" class="modal-overlay" onclick="if(event.target===this)closePaymentModal()">
+    <div class="modal">
+      <h2 class="modal-title">新增还款</h2>
+      <form id="payment-form">
+        <input type="hidden" id="payment-loan-id">
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>还款日期 *</label>
+            <input type="date" id="payment-date" required>
+          </div>
+          <div class="form-group">
+            <label>还款金额（元）*</label>
+            <input type="number" id="payment-amount" step="0.01" min="0" placeholder="1000" required>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>还款模式</label>
+          <select id="payment-mode">
+            <option value="auto">自动抵扣（先息后本）</option>
+            <option value="interest_only">只还利息</option>
+            <option value="principal_only">只还本金</option>
+            <option value="manual">手动分配本息</option>
+          </select>
+        </div>
+        
+        <div id="manual-fields" style="display:none;">
+          <div class="form-row">
+            <div class="form-group">
+              <label>利息部分（元）</label>
+              <input type="number" id="payment-interest-part" step="0.01" min="0" value="0">
+            </div>
+            <div class="form-group">
+              <label>本金部分（元）</label>
+              <input type="number" id="payment-principal-part" step="0.01" min="0" value="0">
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>备注</label>
+          <input type="text" id="payment-note" placeholder="可选备注">
+        </div>
+        
+        <div class="btn-group">
+          <button type="submit" class="btn btn-success btn-block">确认还款</button>
+          <button type="button" class="btn btn-outline btn-block" onclick="closePaymentModal()">取消</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
